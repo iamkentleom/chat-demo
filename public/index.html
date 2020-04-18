@@ -22,6 +22,9 @@
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 <script type="text/javascript">
 
+    const main = window.location.protocol + `//` + window.location.host
+    const socket = io()
+
     function sendMessage(){
         if(name.value === '' || message.value === ''){
             alert(`Name or Message can't be empty`)
@@ -47,6 +50,22 @@
         }
     }
 
+    function deleteMessage(el){
+        const id = { id: el }
+        fetch(`${ main }/messages`, {
+            body: JSON.stringify(id),
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => console.log(res))
+            .catch(err => {
+                error.innerText = `delete: ${ err }`
+            })
+        console.log(`Delete ${el}`)
+    }
+
     function colorized(name) {
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
@@ -60,8 +79,6 @@
         return color;
     }
 
-    const main = window.location.protocol + `//` + window.location.host
-    const socket = io()
     const display = document.getElementById('display')
     const name = document.getElementById('name')
     const message = document.getElementById('message')
@@ -79,11 +96,17 @@
     })
 
     socket.on('message', res => {
-        console.log('this is res')
+        console.log('new message')
         console.log(res)
         const color = colorized(res.name)
-        display.insertAdjacentHTML("beforeend", `<li style="border-left:5px solid ${ color }"><b style="color:${ color }">${ res.name }:</b> ${ res.message }</li>`)
+        display.insertAdjacentHTML("beforeend", `<li style="border-left:5px solid ${ color }" id="delete${ res.message_id }"><b style="color:${ color }">${ res.name }:</b> ${ res.message }<button class="delete" title="Delete message" onclick="deleteMessage(${ res.message_id })">✕</button></li>`)
         window.scrollTo(0, document.body.scrollHeight)
+    })
+
+    socket.on('delete_message', res => {
+        console.log('deleted')
+        console.log(res)
+        document.getElementById(`delete${ res.id }`).remove()
     })
 
     fetch(`${ main }/messages`)
@@ -91,7 +114,7 @@
         .then(arr => {
             arr.forEach(el => {
                 const color = colorized(el.name)
-                display.insertAdjacentHTML("beforeend", `<li style="border-left:5px solid ${ color }"><b style="color:${ color }">${ el.name }:</b> ${ el.message }</li>`)
+                display.insertAdjacentHTML("beforeend", `<li style="border-left:5px solid ${ color }" id="delete${ el.message_id }"><b style="color:${ color }">${ el.name }:</b> ${ el.message }<button class="delete" title="Delete message" onclick="deleteMessage(${ el.message_id })">✕</button></li>`)
             })
                 
         })

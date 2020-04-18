@@ -1,5 +1,5 @@
 const express = require('express')
-const sqlite3 = require('sqlite3')
+const sqlite3 = require('sqlite3').verbose()
 const bodyParser = require('body-parser')
 const cors = require('cors')
 
@@ -46,16 +46,31 @@ app.get('/messages', (req, res) => {
 app.post('/messages', (req, res) => {
     let name = req.body.name
     let message = req.body.message
-    const query = `insert into messages values( NULL,'${ name }', '${ message }')`
+    const query = `insert into messages values( NULL, ?, ?)`
+    db.run(query, [name, message], function(err){
+        if(err){
+            res.sendStatus(500)
+        }else{
+            req.body.message_id = this.lastID
+            io.emit('message', req.body)
+            res.sendStatus(200)
+            console.log('added a message')
+        }
+    })
+
+})
+
+app.delete('/messages', (req, res) => {
+    const query = `delete from messages where message_id = ${ req.body.id }`
     db.run(query, err => {
         if(err){
             res.sendStatus(500)
         }else{
-            io.emit('message', req.body)
+            io.emit('delete_message', req.body)
             res.sendStatus(200)
         }
     })
-
+    console.log('deleted a message')
 })
 
 app.use(function (req, res, next) {
