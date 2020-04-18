@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Chat Demo</title>
+</head>
+<body>
+    <p id="check" class="check"></p>
+    <div class="message-box">
+        <input type="text" name="name" id="name" class="name" placeholder="Name">
+        <input type="text" name="message" id="message" class="message" placeholder="Your message here...">
+        <button id="send">Send</button>
+    </div>
+    <div class="chats">
+        <ul id="display">
+
+        </ul>
+    </div>
+</body>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+
+    function sendMessage(){
+        if(name.value === '' || message.value === ''){
+            alert(`Name or Message can't be empty`)
+        }else{
+            let data = {
+                name: name.value,
+                message: message.value
+            }
+            fetch(`${ main }/messages`, {
+                body: JSON.stringify(data),
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+    
+            })
+                .then(json => console.log(json))
+                .catch(err => {
+                    error.innerText = `post: ${ err }`
+                })
+            message.value = ''
+            message.focus()
+        }
+    }
+
+    function colorized(name) {
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        let color = '#';
+        for (let i = 0; i < 3; i++) {
+            let value = (hash >> (i * 8)) & 0xFF;
+            color += ('00' + value.toString(16)).substr(-2);
+        }
+        return color;
+    }
+
+    const main = window.location.protocol + `//` + window.location.host
+    const socket = io()
+    const display = document.getElementById('display')
+    const name = document.getElementById('name')
+    const message = document.getElementById('message')
+    const error = document.getElementById('check')
+    const btn = document.getElementById('send').addEventListener('click', () => {
+        sendMessage()    
+        console.log('clicked')
+    })
+
+    message.addEventListener('keyup', e => {
+        if(e.keyCode === 13){
+            sendMessage()
+            console.log('entered')
+        }
+    })
+
+    socket.on('message', res => {
+        console.log('this is res')
+        console.log(res)
+        const color = colorized(res.name)
+        display.insertAdjacentHTML("beforeend", `<li style="border-left:5px solid ${ color }"><b style="color:${ color }">${ res.name }:</b> ${ res.message }</li>`)
+        window.scrollTo(0, document.body.scrollHeight)
+    })
+
+    fetch(`${ main }/messages`)
+        .then(res => res.json())
+        .then(arr => {
+            arr.forEach(el => {
+                const color = colorized(el.name)
+                display.insertAdjacentHTML("beforeend", `<li style="border-left:5px solid ${ color }"><b style="color:${ color }">${ el.name }:</b> ${ el.message }</li>`)
+            })
+                
+        })
+        .catch(err => {
+            error.innerText = `get: ${ err }`
+        })
+</script>
+</html>

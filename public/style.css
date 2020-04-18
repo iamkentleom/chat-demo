@@ -1,0 +1,79 @@
+*{
+    font-family: sans-serif;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    border: 0;
+    display: flex;
+    justify-content: center;
+}
+
+ul{
+    list-style-type: none;
+    list-style-position: inside;
+    padding: 0;
+    margin: 0;
+}
+
+li{
+    padding: 8px;
+    background-color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    margin: 5px 0px;
+    word-break: break-all;
+}
+
+li:hover{
+    border: 1px solid #aaaaaa;
+    background-color: #eeeeee;
+}
+
+input{
+    padding: 5px;
+    border: 1px solid #aaaaaa;
+    border-radius: 5px;
+    margin: 2px;
+}
+
+button{
+    padding: 5px;
+    flex-grow: 2;
+    border-radius: 5px;
+    margin: 2px;
+    background-color: #0060df;
+    border: 1px solid #0060df;
+    color: white;
+}
+
+.message-box{
+    background-color: #eeeeee;
+    border-top: 1px solid #aaaaaa;
+    padding: 5px 0px;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.name{
+    flex-grow: 1;
+    width: 75px;
+}
+.message{
+    flex-grow: 4;
+}
+
+.chats{
+    padding: 5px 20px 60px 20px;
+    width: 90%;
+    margin: 0;
+}
+
+.check{
+    position: fixed;
+    top: 10px;
+}
