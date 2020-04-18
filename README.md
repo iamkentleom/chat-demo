@@ -18,4 +18,4 @@ Run server
 npm start
 ```
 
-then headover to http://localhost:3000 to view the application
+then head over to http://localhost:3000 to view the application
