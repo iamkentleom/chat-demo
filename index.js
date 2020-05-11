@@ -77,6 +77,7 @@ app.use(function (req, res, next) {
     res.status(404).sendFile(__dirname + '/public/404.html')
 })
 
-io.on('connection', () => {
-    console.log(`${ Date.now() } A user is connected.`)
+io.on('connection', (user) => {
+    console.log(`${ Date.now() } - User ${ user.id } is connected.`)
+    user.on('disconnect', () => console.log(`${ user.id } disconnected`))
 })
